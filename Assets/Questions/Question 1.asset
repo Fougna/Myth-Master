@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 485eaac5352fdd048be986633b305f12, type: 3}
   m_Name: Question 1
   m_EditorClassIdentifier: 
-  question: Ares etait le Dieu...
+  question: Ares est le dieu de...
   answers:
-  - De l'amour
-  - De la guerre
-  - Du tonnerre
-  - Des dieux
+  - l'amour
+  - la guerre
+  - la foudre
+  - la mort
   correctAnswer: 1

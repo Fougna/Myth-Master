@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 485eaac5352fdd048be986633b305f12, type: 3}
   m_Name: Question 3
   m_EditorClassIdentifier: 
-  question: "Combien de travaux Hercule d\xFBt-il r\xE9aliser ?"
+  question: Combien de travaux Hercule dut-il accomplir ?
   answers:
   - 12
   - 9

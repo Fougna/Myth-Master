@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 485eaac5352fdd048be986633b305f12, type: 3}
   m_Name: Question 4
   m_EditorClassIdentifier: 
-  question: "Atlas porte sur ses \xE9paules..."
+  question: Atlas porte sur ses epaules...
   answers:
   - Le ciel
   - L'Olympe

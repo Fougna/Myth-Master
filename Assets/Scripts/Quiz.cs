@@ -10,8 +10,11 @@ public class Quiz : MonoBehaviour
     [Header("Questions")]
     // Serialized variable to use Text Mesh Pro to write down text on the question in the user interface.
     [SerializeField] TextMeshProUGUI questionText;
-    // Serialized variable to use the question scriptable object class.
-    [SerializeField] QuestionScriptableObject question;
+    // Serialized list to store all the available questions.
+    // To add to security, we also create a new list of questions in this variable.
+    [SerializeField] List<QuestionScriptableObject> questions = new List<QuestionScriptableObject>();
+    // Variable to use the question scriptable object class.
+    QuestionScriptableObject currentQuestion;
 
     [Header("Answers")]
     // Serialized variable to create fields in Unity for the buttons available.
@@ -35,11 +38,8 @@ public class Quiz : MonoBehaviour
 
     void Start()
     {
-        // Then we need to find a reference to the timer game object...
+        // At start, we need a reference to the timer game object...
         timer = FindObjectOfType<Timer>();
-        GetNextQuestion();
-        // The question and answers are displayed.
-        // DisplayQuestion();
     }
 
     void Update()
@@ -90,7 +90,7 @@ public class Quiz : MonoBehaviour
         Image buttonImage;
 
         // If the answer selected as index is the correct answer...
-        if (index == question.GetCorrectAnswer())
+        if (index == currentQuestion.GetCorrectAnswer())
         {
             // The question text box will show the following 'correct' message...
             questionText.text = "Bonne reponse !";
@@ -104,9 +104,9 @@ public class Quiz : MonoBehaviour
         {
             // We create a variable containing the Get Correct Answer method from the question scriptable object.
             // The value of this variable is an integer (or number).
-            correctAnswer = question.GetCorrectAnswer();
+            correctAnswer = currentQuestion.GetCorrectAnswer();
             // We create a string variable to print the correct answer sentence on screen.
-            string goodAnswer = question.GetAnswer(correctAnswer);
+            string goodAnswer = currentQuestion.GetAnswer(correctAnswer);
             // The question text box will display a message concatenated with the string variable sentence.
             questionText.text = "Oups, la bonne reponse etait :\n" + goodAnswer;
             // The button image of the correct answer will be used...
@@ -119,12 +119,34 @@ public class Quiz : MonoBehaviour
     // Everytime another question pops up...
     void GetNextQuestion()
     {
-        // All buttons are enabled...
-        SetButtonState(true);
-        // All buttons image are set to default...
-        SetDefaultButtonSprites();
-        // The question and answers text are displayed.
-        DisplayQuestion();
+        // If the number of questions left is superior to zero...
+        if (questions.Count > 0)
+        {
+            // All buttons are enabled...
+            SetButtonState(true);
+            // All buttons image are set to default...
+            SetDefaultButtonSprites();
+            // We search for a random question...
+            GetRandomQuestion();
+            // The question and answers text are displayed.
+            DisplayQuestion();
+        }
+    }
+
+    // Random question fetch method
+    void GetRandomQuestion()
+    {
+        // We sort the index of question randomly between the first entry in the list (0) and the last (.Count)...
+        int index = Random.Range(0, questions.Count);
+        // The current question is the first question picked up from the randomized index...
+        currentQuestion = questions[index];
+
+        // For security, we verify if the list of questions does contain the current question selected...
+        if(questions.Contains(currentQuestion))
+        {
+            // Then the current question is removed in the list, so it will never pop up again.
+            questions.Remove(currentQuestion);
+        }
     }
 
     // Display Question & Answers Method.
@@ -132,7 +154,7 @@ public class Quiz : MonoBehaviour
     {
         // We call the Get Question method created in the scriptable object to get the question.
         // Then we store the question value in a variable using Text Mesh Pro to load the text on screen.
-        questionText.text = question.GetQuestion();
+        questionText.text = currentQuestion.GetQuestion();
 
         // In order to print on screen all the available answers, we use a 'for loop'.
         // For every element (i) starting from the beginning (index 0) to the last of the answer buttons (answerButtons.Length),
@@ -143,7 +165,7 @@ public class Quiz : MonoBehaviour
             // of the buttons (TextMeshProUGUI) contained in the answer buttons' child component (GetComponentInChildren).
             TextMeshProUGUI buttonText = answerButtons[i].GetComponentInChildren<TextMeshProUGUI>();
             // We call the GetAnswer method to get the answer at each iteration of the loop.
-            buttonText.text = question.GetAnswer(i);
+            buttonText.text = currentQuestion.GetAnswer(i);
         }
     }
 
