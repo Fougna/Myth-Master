@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Timer : MonoBehaviour
-{ 
+{
     // Serialized variable of time left for the player to answer the question.
     [SerializeField] float timeToCompleteQuestion = 30f;
 
@@ -13,12 +13,11 @@ public class Timer : MonoBehaviour
     // Public boolean variable to load (or not) the next question.
     public bool loadNextQuestion;
 
-    // Boolean variable to indicate if the player is answering a question (playing the game).
-    // The variable is public and set by default to false.
-    public bool isAnsweringQuestion = false;
-
     // Public variable to split the timer image depending on the time left.
     public float fillFraction;
+
+    // Public boolean variable to indicate if the player is answering a question (playing the game).
+    public bool isAnsweringQuestion;
 
     // Time left on the timer variable
     float timerValue;
@@ -76,10 +75,9 @@ public class Timer : MonoBehaviour
                 isAnsweringQuestion = true;
                 // The timer will last the amount of time needed for the player to answer the question.
                 timerValue = timeToCompleteQuestion;
+                // At this point, it is possible to load the next question.
                 loadNextQuestion = true;
             }
         }
-
-        Debug.Log(isAnsweringQuestion + ": " + timerValue + " = " + fillFraction);
     }
 }

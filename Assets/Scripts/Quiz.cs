@@ -6,31 +6,85 @@ using UnityEngine.UI;
 
 public class Quiz : MonoBehaviour
 {
+    // Headers are useful to organize serialized variables in the inspector.
+    [Header("Questions")]
     // Serialized variable to use Text Mesh Pro to write down text on the question in the user interface.
     [SerializeField] TextMeshProUGUI questionText;
-
     // Serialized variable to use the question scriptable object class.
     [SerializeField] QuestionScriptableObject question;
 
+    [Header("Answers")]
     // Serialized variable to create fields in Unity for the buttons available.
     [SerializeField] GameObject [] answerButtons;
-
     // Variable containing the correct answer index number.
     int correctAnswer;
+    // Boolean variable to set if the player has answered the question before the timer runs out.
+    bool hasAnsweredEarly;
 
+    [Header("Buttons")]
     // Serialized sprite variable containing the default answer sprite.
     [SerializeField] Sprite defaultAnswerSprite;
-
     // Serialized sprite variable containing the correct answer sprite.
     [SerializeField] Sprite correctAnswerSprite;
 
+    [Header("Timer")]
+    // Serialized Field to select the image for the timer in Unity.
+    [SerializeField] Image timerImage;
+    // In order to access the timer script, we declare a variable related to it.
+    Timer timer;
+
     void Start()
     {
+        // Then we need to find a reference to the timer game object...
+        timer = FindObjectOfType<Timer>();
+        GetNextQuestion();
         // The question and answers are displayed.
-        DisplayQuestion();
+        // DisplayQuestion();
     }
 
+    void Update()
+    {
+        // We tie the fillAmount option from the timer image component to the timer fillFraction variable that was set up to public in the Timer script.
+        timerImage.fillAmount = timer.fillFraction;
+        // If it's possible for the timer to load the next question...
+        if (timer.loadNextQuestion)
+        {
+            // The player mustn't have answered early...
+            hasAnsweredEarly = false;
+            // Then we load a new question...
+            GetNextQuestion();
+            // Once the new question is loaded, we set the possibility to load another question back to false,
+            // so that the script doesn't keep loading a new question every frame.
+            timer.loadNextQuestion = false;
+        }
+        // Or if the player hasn't answered early and cannot answer the question...
+        else if (!hasAnsweredEarly && !timer.isAnsweringQuestion)
+        {
+            // The answer is displayed. To ensure it won't pass accidentally a correct answer,
+            // we use a common practice to pass a negative value since in an array of numbers always starts with 0.
+            DisplayAnswer(-1);
+            // The buttons are disabled.
+            SetButtonState(false);
+        }
+    }
+
+    // Method for when the answer is selected.
+    // We put the index in the parameters, so it can display the correct answer.
     public void OnAnswerSelected(int index)
+    {
+        // The player answered before the timer runs out...
+        hasAnsweredEarly = true;
+        // Therefore, the answer is displayed...
+        DisplayAnswer(index);
+        // Since the player has answered the question, all buttons are disabled...
+        SetButtonState(false);
+        // And the timer is stopped.
+        timer.CancelTimer();
+    }
+
+    // Method to display the answer.
+    // We put the index in the parameters, so it can display the correct answer.
+    void DisplayAnswer(int index)
     {
         // Image variable linking to the buttons image.
         Image buttonImage;
@@ -45,6 +99,7 @@ public class Quiz : MonoBehaviour
             // And the corresponding sprite will be the correct answer sprite.
             buttonImage.sprite = correctAnswerSprite;
         }
+        // Otherwise...
         else
         {
             // We create a variable containing the Get Correct Answer method from the question scriptable object.
@@ -53,15 +108,12 @@ public class Quiz : MonoBehaviour
             // We create a string variable to print the correct answer sentence on screen.
             string goodAnswer = question.GetAnswer(correctAnswer);
             // The question text box will display a message concatenated with the string variable sentence.
-            questionText.text = "Faux, la bonne reponse est :\n" + goodAnswer;
-            // The button image of the correct answer will be accessed...
+            questionText.text = "Oups, la bonne reponse etait :\n" + goodAnswer;
+            // The button image of the correct answer will be used...
             buttonImage = answerButtons[correctAnswer].GetComponent<Image>();
             // And the corresponding sprite will be the correct answer sprite.
             buttonImage.sprite = correctAnswerSprite;
         }
-
-        // Once the player has answered the question (right or wrong), all buttons become disabled.
-        SetButtonState(false);
     }
 
     // Everytime another question pops up...
@@ -95,7 +147,7 @@ public class Quiz : MonoBehaviour
         }
     }
 
-    // Button State set to clickable (interactable) Method
+    // Button State set to clickable (interactable) method
     void SetButtonState(bool state)
     {
         // By default, we want all the answer buttons to be clickable.
@@ -112,10 +164,12 @@ public class Quiz : MonoBehaviour
     // Button Sprite set to default Method
     void SetDefaultButtonSprites()
     {
-        // For all the answer buttons, we set their default image...
+        // The loop browses through all the buttons available...
         for (int i = 0; i < answerButtons.Length; i++)
         {
+            // And find their image component that will be stored in a variable...
             Image buttonImage = answerButtons[i].GetComponent<Image>();
+            // Then we set the button image to default.
             buttonImage.sprite = defaultAnswerSprite;
         }
     }
