@@ -22,7 +22,7 @@ public class Quiz : MonoBehaviour
     // Variable containing the correct answer index number.
     int correctAnswer;
     // Boolean variable to set if the player has answered the question before the timer runs out.
-    bool hasAnsweredEarly;
+    bool hasAnsweredEarly = true;
 
     [Header("Buttons")]
     // Serialized sprite variable containing the default answer sprite.
@@ -36,10 +36,18 @@ public class Quiz : MonoBehaviour
     // In order to access the timer script, we declare a variable related to it.
     Timer timer;
 
+    [Header("Scoring")]
+    // Serialized variable to use Text Mesh Pro to modify the score on the UI.
+    [SerializeField] TextMeshProUGUI scoreText;
+    // In order to access the score script, we declare a variable related to it.
+    Score score;
+
     void Start()
     {
         // At start, we need a reference to the timer game object...
         timer = FindObjectOfType<Timer>();
+        // And a reference to the score game object.
+        score = FindObjectOfType<Score>();
     }
 
     void Update()
@@ -78,8 +86,10 @@ public class Quiz : MonoBehaviour
         DisplayAnswer(index);
         // Since the player has answered the question, all buttons are disabled...
         SetButtonState(false);
-        // And the timer is stopped.
+        // The timer is stopped...
         timer.CancelTimer();
+        // And the score text is modified after the score calculation.
+        scoreText.text = "Score: " + score.CalculateScore() + "%";
     }
 
     // Method to display the answer.
@@ -96,8 +106,10 @@ public class Quiz : MonoBehaviour
             questionText.text = "Bonne reponse !";
             // The button image will be accessed...
             buttonImage = answerButtons[index].GetComponent<Image>();
-            // And the corresponding sprite will be the correct answer sprite.
+            // The sprite shown will be the correct answer sprite...
             buttonImage.sprite = correctAnswerSprite;
+            // And the score will be incremented by one.
+            score.IncrementCorrectAnswers();
         }
         // Otherwise...
         else
@@ -128,8 +140,10 @@ public class Quiz : MonoBehaviour
             SetDefaultButtonSprites();
             // We search for a random question...
             GetRandomQuestion();
-            // The question and answers text are displayed.
+            // The question and answers text are displayed...
             DisplayQuestion();
+            // And the number of questions seens is incremented by one.
+            score.IncrementQuestionsSeen();
         }
     }
 
@@ -159,7 +173,7 @@ public class Quiz : MonoBehaviour
         // In order to print on screen all the available answers, we use a 'for loop'.
         // For every element (i) starting from the beginning (index 0) to the last of the answer buttons (answerButtons.Length),
         // the loop browses every element by one iteration or step (i++).
-        for (int i=0 ; i<answerButtons.Length ; i++)
+        for (int i = 0 ; i < answerButtons.Length ; i++)
         {
             // Once the answer buttons are imported in the script's serialized fields, we store the text value
             // of the buttons (TextMeshProUGUI) contained in the answer buttons' child component (GetComponentInChildren).

@@ -38,6 +38,6 @@ public class QuestionScriptableObject : ScriptableObject
     // Getter Method to get the index of the answers array.
     public string GetAnswer(int index)
     {
-        return answers [index];
+        return answers[index];
     }
 }
