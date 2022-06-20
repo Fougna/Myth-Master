@@ -42,12 +42,25 @@ public class Quiz : MonoBehaviour
     // In order to access the score script, we declare a variable related to it.
     Score score;
 
-    void Start()
+    [Header("Progress Bar")]
+    // Serialized variable to add the slider to the game canvas and use it in the script.
+    [SerializeField] Slider progressBar;
+
+    // Public boolean variable to define if the game is complete or not.
+    public bool isComplete;
+
+    // In order to make all canvases are ready to use before the game actually starts,
+    // we store the reference calls in the Awake method.
+    void Awake()
     {
         // At start, we need a reference to the timer game object...
         timer = FindObjectOfType<Timer>();
-        // And a reference to the score game object.
+        // And a reference to the score game object...
         score = FindObjectOfType<Score>();
+        // We also need to set the slider progress bar's maximum value to the maximum number of questions...
+        progressBar.maxValue = questions.Count;
+        // And set its current value at zero, since it's the beginning of the game.
+        progressBar.value = 0;
     }
 
     void Update()
@@ -57,6 +70,16 @@ public class Quiz : MonoBehaviour
         // If it's possible for the timer to load the next question...
         if (timer.loadNextQuestion)
         {
+            // First, we verify if in case the progress bar reaches its maximum value...
+            if (progressBar.value == progressBar.maxValue)
+            {
+                // The game is complete.
+                isComplete = true;
+                // We return the boolean value to ensure we get back to the game without errors.
+                return;
+            }
+
+            // Otherwise, the game continues.
             // The player mustn't have answered early...
             hasAnsweredEarly = false;
             // Then we load a new question...
@@ -77,12 +100,12 @@ public class Quiz : MonoBehaviour
     }
 
     // Method for when the answer is selected.
-    // We put the index in the parameters, so it can display the correct answer.
+    // We put the index in the parameters, so it can display the answer selected by the player.
     public void OnAnswerSelected(int index)
     {
-        // The player answered before the timer runs out...
+        // The player answers before the timer runs out...
         hasAnsweredEarly = true;
-        // Therefore, the answer is displayed...
+        // Therefore, the selected answer is displayed...
         DisplayAnswer(index);
         // Since the player has answered the question, all buttons are disabled...
         SetButtonState(false);
@@ -136,12 +159,14 @@ public class Quiz : MonoBehaviour
         {
             // All buttons are enabled...
             SetButtonState(true);
-            // All buttons image are set to default...
+            // All button images are set to default...
             SetDefaultButtonSprites();
             // We search for a random question...
             GetRandomQuestion();
             // The question and answers text are displayed...
             DisplayQuestion();
+            // The progress bar value is incremented by one...
+            progressBar.value++;
             // And the number of questions seens is incremented by one.
             score.IncrementQuestionsSeen();
         }
