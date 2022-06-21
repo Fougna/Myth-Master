@@ -4,7 +4,7 @@ A 2D Unity quiz game project about myths and legends
 ![Screenshot](http://www.kavaseb.com/site/Mythmaster.gif)
 
  **Game Design**
- - Player Experience: Knowleadgeable
+ - Player Experience: Feeling knowledgeable
  - Core Mechanic: Test your knowledge with questions revolving around myths from various cultures
  - Game Loop: Answer correctly to questions with a time limit 
 
